@@ -1,13 +1,13 @@
 #!/bin/bash
-#SBATCH --job-name="openrlhg-dpo"     # a name for your job
-#SBATCH --partition=<partition-name>            # <---- partition to which job should be submitted
-#SBATCH --account=<account-name>              # <---- account to which job should be charged
+#SBATCH --job-name="dpo-openrlhf"     # a name for your job
+#SBATCH --partition=<partition-name>             # <---- partition to which job should be submitted
+#SBATCH --account=<account-name>               # <---- account to which job should be charged
 #SBATCH --nodes=1                # node count
 #SBATCH --ntasks-per-node=1      # total number of tasks across all nodes
 #SBATCH --gpus-per-node=1        # Number of GPUs per node (4 per node)
 #SBATCH --cpus-per-task=24
 #SBATCH --mem=256GB
-#SBATCH --time=49:20:00          # total run time limit (HH:MM:SS)
+#SBATCH --time=07:00:00          # total run time limit (HH:MM:SS)
 #SBATCH --output %x_%N_%j.out    # Output file
 #SBATCH --error %x_%N_%j.out     # Error file
 
@@ -29,13 +29,13 @@ export MASTER_PORT=$head_port
 
 export CMD=" torchrun --nproc_per_node 1 --nnodes $NNODES \
     -m openrlhf.cli.train_dpo \
-   --save_path ./checkpoint/qwen2-0.5B-Instruct \
+   --save_path ./checkpoint/qwen2.5-0.5B-Instruct-dpo \
    --save_steps -1 \
    --logging_steps 1 \
    --eval_steps -1 \
    --train_batch_size 256 \
    --micro_train_batch_size 1 \
-   --pretrain Qwen/Qwen2-0.5B-Instruct \
+   --pretrain /n/holylfs06/LABS/kempner_shared/Lab/model/Qwen2.5/Qwen2.5-0.5B-Instruct \
    --bf16 \
    --max_epochs 1 \
    --max_len 8192 \
@@ -52,7 +52,7 @@ export CMD=" torchrun --nproc_per_node 1 --nnodes $NNODES \
 
 echo $CMD
 
-IMAGE_FILE="/n/netscratch/kempner_dev/Lab/bdesinghu/RL/openrlhf.sif"
+IMAGE_FILE="/n/holylfs06/LABS/kempner_shared/Everyone/workflow/RL/singularity_images/openrlhf_test.sif"
 
 export SINGULARITY_BIND="/etc/nsswitch.conf,/etc/slurm,/lib64/libnss_sss.so.2:/lib/libnss_sss.so.2,/var/run/munge:/run/munge,/slurm,/usr/bin/sacct,/usr/bin/salloc,/usr/bin/sbatch,/usr/bin/scancel,/usr/bin/scontrol,/usr/bin/scrontab,/usr/bin/seff,/usr/bin/sinfo,/usr/bin/squeue,/usr/bin/srun,/usr/bin/sshare,/usr/bin/sstat,/usr/bin/strace,/usr/lib64/libmunge.so.2,/usr/lib64/slurm,/var/lib/sss,/etc/pki/ca-trust/extracted/pem/,/sys,/etc/ssl/certs/,/usr/lib64/pmix,"
 
